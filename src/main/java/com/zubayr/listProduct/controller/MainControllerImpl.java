@@ -1,8 +1,8 @@
 package com.zubayr.listProduct.controller;
 
 import com.zubayr.listProduct.dto.ListDto;
-import com.zubayr.listProduct.dto.ListOfProductsDto;
 import com.zubayr.listProduct.dto.ProductDto;
+import com.zubayr.listProduct.exception.MaxCountToListException;
 import com.zubayr.listProduct.service.MainService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +26,12 @@ public class MainControllerImpl implements MainController{
     @PostMapping("/save_list")
     @Override
     @ApiOperation("Save List")
-    public ResponseEntity<ListDto> saveList(@RequestBody ListDto dto) {
-        return mainService.saveList(dto);
+    public ResponseEntity<?> saveList(@RequestBody ListDto dto) {
+        try {
+            return mainService.saveList(dto);
+        } catch (MaxCountToListException e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/save_product")
@@ -40,8 +44,12 @@ public class MainControllerImpl implements MainController{
     @PutMapping("/{product_id}/add/{list_id}")
     @Override
     @ApiOperation("Add Product to List")
-    public ResponseEntity<ListOfProductsDto> addProductToList(@PathVariable("product_id") String productId,@PathVariable("list_id") String listId) {
-        return mainService.addProductToList(productId, listId);
+    public ResponseEntity<?> addProductToList(@PathVariable("product_id") String productId,@PathVariable("list_id") String listId) {
+        try {
+            return mainService.addProductToList(productId, listId);
+        } catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/all_product")
@@ -54,7 +62,11 @@ public class MainControllerImpl implements MainController{
     @GetMapping("/list/{id}")
     @Override
     @ApiOperation("Get list of Products")
-    public ResponseEntity<ListOfProductsDto> getById(@PathVariable String id) {
-        return mainService.getListOfProduct(id);
+    public ResponseEntity<?> getById(@PathVariable String id) {
+        try {
+            return mainService.getListOfProduct(id);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

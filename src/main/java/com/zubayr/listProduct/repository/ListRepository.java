@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ListRepository extends MongoRepository<List, String> {
+
 }

@@ -10,6 +10,7 @@ import com.zubayr.listProduct.repository.ListRepository;
 import com.zubayr.listProduct.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
+@PropertySource("classpath:application.yml")
 public class MainService {
 
     private final ListRepository listRepository;
@@ -44,28 +46,27 @@ public class MainService {
         return ResponseEntity.ok(ProductDto.createDto(productRepository.save(Product.createProduct(dto))));
     }
 
-    public ResponseEntity<ListOfProductsDto> addProductToList(String productId, String listId) {
+    public ResponseEntity<ListOfProductsDto> addProductToList(String productId, String listId) throws Exception {
         Optional<Product> optionalProduct = productRepository.findById(productId);
         Optional<List> optionalList = listRepository.findById(listId);
-        optionalList.ifPresent(list -> {
-            list.addProduct(optionalProduct.orElseThrow().getId());
-            listRepository.save(list);
-        });
-        return ResponseEntity.ok(getListOfProductsDto(listId));
+        if (optionalProduct.isPresent() && optionalList.isPresent()) {
+            optionalList.get().addProduct(optionalProduct.get().getId());
+            listRepository.save(optionalList.get());
+            return ResponseEntity.ok(getListOfProductsDto(listId));
+        } else {
+            throw new ClassNotFoundException(String.format("c id %s|%s ничего не найдено", productId, listId));
+        }
     }
 
     public ResponseEntity<Set<ProductDto>> getAllProducts() {
-        return ResponseEntity.ok(productRepository.findAll()
-                .stream()
-                .map(ProductDto::createDto)
-                .collect(Collectors.toSet()));
+        return ResponseEntity.ok(productRepository.findDto());
     }
 
-    public ResponseEntity<ListOfProductsDto> getListOfProduct(String listId) {
+    public ResponseEntity<ListOfProductsDto> getListOfProduct(String listId) throws Exception {
         return ResponseEntity.ok(getListOfProductsDto(listId));
     }
 
-    private ListOfProductsDto getListOfProductsDto(String listId) {
+    private ListOfProductsDto getListOfProductsDto(String listId) throws Exception {
         return listRepository.findById(listId)
                 .map(list -> {
                             ListOfProductsDto dto = new ListOfProductsDto();

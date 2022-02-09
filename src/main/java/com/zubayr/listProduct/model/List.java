@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@Document(collation = "lists")
+@Document(collection = "lists")
 @AllArgsConstructor
 @NoArgsConstructor
 public class List {

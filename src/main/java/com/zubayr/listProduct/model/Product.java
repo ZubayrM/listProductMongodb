@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Document(collation = "products")
+@Document(collection = "products")
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
